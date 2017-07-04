@@ -14,9 +14,6 @@ $(window).load ->
     provider = new firebase.auth.GithubAuthProvider();
     provider.addScope 'public_repo'
     firebase.auth().signInWithPopup(provider).then((data) ->
-      firebase.database().ref("users/#{data.user.uid}").once 'value', (profile_doc) ->
-        profile_doc.child('access_token').ref.set data.credential.accessToken
+      firebase.database().ref("users/#{data.user.uid}/access_token").ref.set data.credential.accessToken
     ).catch (error) ->
       console.log error
-
-

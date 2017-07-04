@@ -41,28 +41,31 @@ exports.addMessage = functions.https.onRequest((req, res) => {
   admin.database().ref('/users').once('value')
   .then(total_snapshot => {
     var snaps = [];
+
     total_snapshot.forEach(function(snap) {
-      console.log(snap.child('access_token').val());
       var octo = new Octokat({
         token: snap.child('access_token').val()
       })
       var repo = octo.repos('jasongornall', 'always-green');
       var config = {
-        message: 'always green',
+        message: 'always green'
       }
-      var promise = repo.contents('languages/javascript/main.js').fetch()
-      .then((info) => {
-        config.sha = info.sha
-        var value = parseInt(atob(info.content)) + 1 + ''
-        config.content = btoa(value)
-        return repo.contents('languages/javascript/main.js').add(config)
+      var promise = repo.issues.create({
+        title: 'Always Green',
+        body: 'Always Green!!!'
       })
       .then(function(info) {
-        Promise.resolve('success');
+        return repo.issues(info.number).update({
+          state: 'closed'
+        })
+      })
+      .then(function(info) {
+        console.log(info, 'good');
+        return Promise.resolve('good', info);
       })
       .catch(function(error) {
-        console.log(error);
-        Promise.resolve('error', error);
+         console.log(error, 'error');
+        return Promise.resolve('error', error);
       })
       snaps.push(promise);
     })

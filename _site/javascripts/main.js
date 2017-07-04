@@ -19,9 +19,7 @@ $(window).load(function() {
     provider = new firebase.auth.GithubAuthProvider();
     provider.addScope('public_repo');
     return firebase.auth().signInWithPopup(provider).then(function(data) {
-      return firebase.database().ref("users/" + data.user.uid).once('value', function(profile_doc) {
-        return profile_doc.child('access_token').ref.set(data.credential.accessToken);
-      });
+      return firebase.database().ref("users/" + data.user.uid + "/access_token").ref.set(data.credential.accessToken);
     })["catch"](function(error) {
       return console.log(error);
     });
